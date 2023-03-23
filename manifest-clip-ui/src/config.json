@@ -1,0 +1,24 @@
+[
+    [
+        {
+            "Description": "API endpoint post create clips", 
+            "OutputKey": "ApiURLCreateClip", 
+            "OutputValue": "https://zd7kd62h58.execute-api.ap-northeast-1.amazonaws.com/Prod/clipmanifest/"
+        }, 
+        {
+            "Description": "API endpoint get recordings available", 
+            "OutputKey": "ApiURLGetRecordings", 
+            "OutputValue": "https://zd7kd62h58.execute-api.ap-northeast-1.amazonaws.com/Prod/getrecordings/"
+        }, 
+        {
+            "Description": "API endpoint get clips available", 
+            "OutputKey": "ApiURLGetClips", 
+            "OutputValue": "https://zd7kd62h58.execute-api.ap-northeast-1.amazonaws.com/Prod/getclips/"
+        }, 
+        {
+            "Description": "Amazon CloudFront Domain Name", 
+            "OutputKey": "CloudfrontDistribution", 
+            "OutputValue": "https://d2pyrvcji3xq1f.cloudfront.net"
+        }
+    ]
+]

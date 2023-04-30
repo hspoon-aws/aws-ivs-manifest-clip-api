@@ -4,12 +4,17 @@ Clip API Wrapper is a serverless application built on top of the Amazon IVS Clip
 
 ## Overview
 
+<img src="IVS-IVS-Clip-API-Wrapper.drawio.png">
+
 1. The `ivs-recording-state-change-handler` listens for IVS recording state change events from Amazon EventBridge and stores metadata in an Amazon DynamoDB table.
 2. The `clip-api-wrapper` is an API-triggered Lambda function that:
    - Accepts the IVS channel ARN, start time, and end time in UTC time string format.
    - Queries metadata from the DynamoDB table to get the IVS recording path in Amazon S3.
    - Retrieves the recording start time from the S3 events/record-started.json file to calculate the video timestamp in seconds from the UTC time string.
    - Passes the calculated parameters to the original Amazon IVS Clip Manifest Standalone API using `Lambda.invoke()` and returns the IVS Clip Manifest details to the API caller.
+
+
+
 
 ## Prerequisites
 

@@ -1,7 +1,7 @@
 # *Disclaimer* 
  - This fork is a modified version from Amazon IVS team. (Original from Osmar Bento da Silva Junior@AWS)
- - Customized for clip API with Start/End Clock time in UTC.
- - Only  Standalone API + Pre-Processing Lambda was being tested.
+ - Added **[Clip API Wrapper](/clip-api-wrapper-for-clocktime-inputs//README.md)**  to allow Clock time in TUC as inputs 
+ - Only  Standalone API + Clip API Wrapper  was being tested.
  - For reference only. Not for production use.
 
 

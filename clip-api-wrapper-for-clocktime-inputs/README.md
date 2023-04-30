@@ -99,4 +99,6 @@ If you have any questions, issues, or feature requests, please open an issue in 
 
 ## License
 
-This project is released under the [MIT License](LICENSE). Please see the [LICENSE](LICENSE) file for details.
+This sample project is owned by Shing Poon@AWS.
+
+[Return to home page of the solution](../README.md)

@@ -1,8 +1,10 @@
-# *Disclaimer* 
+# *Disclaimer and Add-on* 
  - This fork is a modified version from Amazon IVS team. (Original from Osmar Bento da Silva Junior@AWS)
- - Added **[Clip API Wrapper](/clip-api-wrapper-for-clocktime-inputs//README.md)**  to allow Clock time in TUC as inputs 
+ - Added **[Clip API Wrapper](/clip-api-wrapper-for-clocktime-inputs//README.md)**  to allow Clock time in UTC as inputs 
  - Only  Standalone API + Clip API Wrapper  was being tested.
  - For reference only. Not for production use.
+
+ For any enquiry, please contact Shing Poon @ AWS (hspoon@amazon.com)
 
 
 # Amazon IVS manifest clipping solution

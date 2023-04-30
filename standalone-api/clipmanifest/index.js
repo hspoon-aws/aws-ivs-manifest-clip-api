@@ -187,7 +187,7 @@ exports.handler = async (event) => {
       let segmentPDT = new Date(segment.pdt)
       let date = segmentPDT.getTime()
       let endDate = date + segment.duration * 1000
-      if (endDate >= clipStartAt && date <= clipEndAt) {
+      if (endDate > clipStartAt && date < clipEndAt) {
         filterSegments.push(segment)
       }
     }

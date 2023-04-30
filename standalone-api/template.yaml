@@ -2,6 +2,13 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Amazon IVS Clip Manisfest Standalone API
 
+Parameters:
+  IVSRecordingSAPIBucketNameParameter:
+    Type: String
+    Default: 'my-new-ivs-recording-bucket-standalone-api'
+    Description: S3 Bucket Name for the IVS recording
+
+
 Globals:
   Function:
     Runtime: nodejs12.x
@@ -55,7 +62,7 @@ Resources:
         # To connect the CDN to the origins you need to specify behaviours
         DefaultCacheBehavior:
           # Compress resources automatically ( gzip )
-          Compress: 'true'
+          Compress: true
           AllowedMethods:
             - HEAD
             - GET
@@ -71,7 +78,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       # Change bucket name if you want to have a custom name
-      BucketName: !Sub "my-new-ivs-recording-bucket-standalone-api${AWS::AccountId}" ## add account is !GetAtt AWS::AccountId
+      BucketName: !Ref IVSRecordingSAPIBucketNameParameter
        # S3 Bucket Cors Policy
       CorsConfiguration:
         CorsRules : [

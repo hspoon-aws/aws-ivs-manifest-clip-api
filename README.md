@@ -1,3 +1,10 @@
+# *Disclaimer* 
+ - This fork is a modified version from Amazon IVS team. (Original from Osmar Bento da Silva Junior@AWS)
+ - Customized for clip API with Start/End Clock time in UTC.
+ - Only  Standalone API + Pre-Processing Lambda was being tested.
+ - For reference only. Not for production use.
+
+
 # Amazon IVS manifest clipping solution
 The Amazon IVS manifest clipping solution offers a reference solution that demonstrates how you can use HTTP live streaming (HLS) Program-Date-Time (PDT) tags and HLS byte range manifest files to clip the recordings stored on [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) using the [Auto-Record to Amazon S3](https://docs.aws.amazon.com/ivs/latest/userguide/record-to-s3.html).
 

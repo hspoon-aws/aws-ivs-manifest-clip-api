@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A Wrapper on top of Amazon IVS Clip Manisfest Standalone API with start/end clock time as input
+
+Parameters:
+  DynamoTableNameParameter:
+    Type: String
+    Default: ivs_recordings
+    Description: Table name in DynamoDB to store the IVS recording event from EventBridge
+  CloudFrontDistributionForIVSRecordingS3Parameter:
+    Type: String
+    Description: CloudFront Distribution for the IVS recording S3 bucket in https protocol
+  ClipAPILambdaArnParameter:
+    Type: String
+    Description: the IVS Clip Manifest standalone api Lamdba ARN from the same git project
+  IVSChannelARNParameter:
+    Type: String
+    Description: IVS Channel ARN of the recording IVS
+  IVSRecordingS3BucketParameter:
+    Type: String
+    Description: S3 Bucket Name of the recording IVS 
+
+Globals:
+  Function:
+    Runtime: python3.10
+    Timeout: 40
+    MemorySize: 128
+    Environment:
+      Variables:
+        DYNAMO_DB_TABLE_NAME: !Ref DynamoTableNameParameter
+        CLOUDFRONT_URL_FOR_S3: !Ref CloudFrontDistributionForIVSRecordingS3Parameter
+        CLIP_API_LAMBDA_ARN: !Ref ClipAPILambdaArnParameter
+
+Resources:
+  # IVS Recording State Change Hanlder Lambda
+  IVSRecordingStateChangeHandler:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: ivs-recording-state-change-handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoTableNameParameter
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:CreateTable
+              Resource:
+                - arn:aws:dynamodb:*:*:table/*
+      Events:
+        IVSRecordingStateChange:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: default
+            Pattern:
+              source:
+                - aws.ivs
+              detail-type:
+                - IVS Recording State Change
+
+  # Clip API Wrapper Lambda
+  ClipAPIWrapper:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      CodeUri: clip-api-wrapper
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DynamoTableNameParameter
+        - S3ReadPolicy:
+            BucketName: !Ref IVSRecordingS3BucketParameter
+        - LambdaInvokePolicy:
+            FunctionName: !Select [6, !Split [":", !Ref ClipAPILambdaArnParameter]]
+      Events:
+        ApiGateway:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ClipAPIWrapperApi
+            Path: /clipmanifestwithclocktime
+            Method: POST 
+            Auth:
+              InvokeRole: NONE
+
+  # REST API definition
+  ClipAPIWrapperApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: default
+      Auth:
+        DefaultAuthorizer: AWS_IAM
+
+Outputs:
+  ClipAPIWrapperAPIUrl:
+    Description: "API endpoint post create clips with Clock Time"
+    Value: !Sub "https://${ClipAPIWrapperApi}.execute-api.${AWS::Region}.amazonaws.com/default/clipmanifestwithclocktime/" 

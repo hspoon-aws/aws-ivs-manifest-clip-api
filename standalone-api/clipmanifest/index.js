@@ -119,8 +119,8 @@ exports.handler = async (event) => {
     return playlists
   }
   // (4) request the playlist manifest from S3 and return the raw playslist manifest
-  async function getPlaylistManifest(playlists) {
-    let playlistURL = `${pathName}/${playlists[0].uri}`
+  async function getPlaylistManifest(playlist) {
+    let playlistURL = `${pathName}/${playlist.uri}`
     try {
       const playlistManifest = await getManifestfromS3(playlistURL)
       return playlistManifest
@@ -131,7 +131,13 @@ exports.handler = async (event) => {
   }
 
   const mediaPlaylists = parseMaster(rawMasterManifest)
-  const rawPlaylistManifest = await getPlaylistManifest(mediaPlaylists)
+  const rawPlaylistManifests = []
+  if (mediaPlaylists) {
+    for (const playlist of mediaPlaylists) {
+      const rawPlaylistManifest = await getPlaylistManifest(playlist)
+      rawPlaylistManifests.push(rawPlaylistManifest)
+    }
+  }
 
   // (5) parse the playlist manifest and return the segments
   let genericExt = []
@@ -198,19 +204,28 @@ exports.handler = async (event) => {
     for (let i = 0; i < genericExt.length; i++) {
       playlist += `${genericExt[i]}\n`
     }
-    playlist += `#EXT-X-TWITCH-TOTAL-SECS:${totalDuration.toFixed(3)}\n`
+    if (!byteRange) {
+      playlist += `#EXT-X-TWITCH-TOTAL-SECS:${totalDuration.toFixed(3)}\n`
+    }
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i]
       const byteTag = segment.byte ? `${segment.byte}\n` : ''
-      playlist += `#EXT-X-PROGRAM-DATE-TIME:${segment.pdt}\n#EXTINF:${segment.duration}\n${byteTag}${segment.uri}\n`
+      playlist += `#EXT-X-PROGRAM-DATE-TIME:${segment.pdt}\n#EXTINF:${segment.duration.toFixed(3)},\n${byteTag}${segment.uri}\n`
     }
     playlist += '#EXT-X-ENDLIST'
     return playlist
   }
 
-  const newPlaylist = createPlaylistManifest(
-    clipPlaylistbyPDT(rawPlaylistManifest, startTime, endTime)
-  )
+  const newPlaylists = []
+  if (mediaPlaylists) {
+    for (var i=0; i<mediaPlaylists.length; i++) {
+      const newPlaylist = createPlaylistManifest(
+        clipPlaylistbyPDT(rawPlaylistManifests[i], startTime, endTime)
+      )
+      newPlaylists.push(newPlaylist)
+    }
+  }
+  
 
   // (8) write to S3 the filtered Master Manifest
   let writePromises = []
@@ -231,15 +246,15 @@ exports.handler = async (event) => {
 
   // (9) write to S3 the filtered Media Playlist
   if (mediaPlaylists) {
-    for (const playlist of mediaPlaylists) {
+    mediaPlaylists.forEach(function(playlist, i) {
       const newLocation = `${s3BucketFolder}/${playlist.base}`
       const playlistWritePromise = writeToS3(
-        newPlaylist,
+        newPlaylists[i],
         `${excutionTime}_clip_playlist.m3u8`,
         newLocation
       )
       writePromises.push(playlistWritePromise)
-    }
+    });
   }
 
   await Promise.all(writePromises)

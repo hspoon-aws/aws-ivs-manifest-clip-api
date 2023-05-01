@@ -77,6 +77,16 @@ Replace `your-api-gateway-url` with the API Gateway URL from the deployment outp
 
 The API will return the IVS Clip Manifest details in `clip.master_url`, which can be used to play the clip using an IVS player or download the clip using a compatible media player or tool.
 
+Sample input:
+```
+{
+    "channel_arn": "arn:aws:ivs:ap-northeast-1:account_id:channel/channel_id",
+    "start_time" : "2023-04-30T23:59:00Z",
+    "end_time" : "2023-05-01T00:00:30Z",
+    "invoke_clip_api": true
+}
+```
+
 Sample output:
 ```
 {
@@ -97,6 +107,9 @@ Sample output:
     ]
 }
 ```
+Postman screen capture:
+
+<img src="postman-result-screen.jpg">
 
 ## Support and Contributions
 

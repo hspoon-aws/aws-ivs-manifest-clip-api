@@ -1,6 +1,5 @@
 *.ts
 *.m3u8
-*.jpg
 .aws-sam/
 .aws-sam
 samconfig.toml
